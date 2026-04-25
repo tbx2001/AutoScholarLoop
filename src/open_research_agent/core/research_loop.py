@@ -224,6 +224,9 @@ class ResearchGroupLoopPipeline:
                 context=dict(context, execution_round=round_id, focus=focus),
                 schema_hint={"objective": "str", "work_packages": "list[str]"},
             )
+            plan["execution_round"] = round_id
+            plan["focus"] = focus
+            plan["selected_idea"] = context.get("selected_idea", "")
             code_generation = self.provider.complete_json(
                 role="phd_code_agent",
                 task="code_generation",
@@ -236,6 +239,7 @@ class ResearchGroupLoopPipeline:
             )
             code_paths = _write_experiment_scaffold(workspace, context, execution_history, code_generation)
             plan["commands"] = code_generation.get("commands") or plan.get("commands", [])
+            plan["code_generation_notes"] = code_generation.get("notes", "")
             backend = self.services["executor"].execute(workspace.root, plan)
             execution = self.provider.complete_json(
                 role="phd_execution_group",
@@ -244,6 +248,7 @@ class ResearchGroupLoopPipeline:
                 schema_hint={"runs": "list[run]", "open_issues": "list[str]"},
             )
             execution["backend_result"] = backend
+            paths.extend(backend.get("task_files", []))
             review = {
                 "decision": "promote_to_writing"
                 if round_id == self.policy.execution_rounds
@@ -285,6 +290,9 @@ class ResearchGroupLoopPipeline:
         context["code_artifacts"] = sorted(
             str(path) for path in (workspace.root / "code").rglob("*") if path.is_file()
         )
+        context["agent_task_artifacts"] = sorted(
+            str(path) for path in (workspace.root / "agent_tasks").rglob("*") if path.is_file()
+        )
         analysis = _results_analysis_markdown(execution_history)
         claims = _claims_from_results_markdown(execution_history)
         audit = _experiment_audit_markdown(execution_history)
@@ -293,7 +301,12 @@ class ResearchGroupLoopPipeline:
         write_canonical(workspace, "02_execution", "RESULTS_ANALYSIS.md", analysis)
         write_canonical(workspace, "02_execution", "CLAIMS_FROM_RESULTS.md", claims)
         write_canonical(workspace, "02_execution", "EXPERIMENT_AUDIT.md", audit)
-        write_canonical(workspace, "02_execution", "GENERATED_CODE.md", _generated_code_markdown(context["code_artifacts"]))
+        write_canonical(
+            workspace,
+            "02_execution",
+            "GENERATED_CODE.md",
+            _generated_code_markdown(context["code_artifacts"], context["agent_task_artifacts"]),
+        )
         paths.extend(context["code_artifacts"])
         paths.append(
             workspace.write_artifact(
@@ -792,7 +805,7 @@ if __name__ == "__main__":
 '''
 
 
-def _generated_code_markdown(paths: list[str]) -> str:
+def _generated_code_markdown(paths: list[str], agent_task_paths: list[str] | None = None) -> str:
     lines = [
         "# Generated Code",
         "",
@@ -802,6 +815,18 @@ def _generated_code_markdown(paths: list[str]) -> str:
     ]
     for path in paths:
         lines.append(f"- {path}")
+    if agent_task_paths:
+        lines.extend(
+            [
+                "",
+                "## External Agent Tasks",
+                "",
+                "These task packages can be handed to a coding agent or repository skill for manual or semi-automated execution.",
+                "",
+            ]
+        )
+        for path in agent_task_paths:
+            lines.append(f"- {path}")
     return "\n".join(lines) + "\n"
 
 
