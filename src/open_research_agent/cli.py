@@ -55,7 +55,7 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument(
         "--execution-backend",
         default="dry-run",
-        choices=["dry-run", "shell"],
+        choices=["dry-run", "shell", "agent-task"],
         help="Execution backend for exploration runs.",
     )
     run.add_argument(
@@ -89,7 +89,7 @@ def build_parser() -> argparse.ArgumentParser:
     batch.add_argument("--model", default="local-researcher")
     batch.add_argument("--base-url", default=None)
     batch.add_argument("--literature", default="local", choices=["local", "semanticscholar", "openalex"])
-    batch.add_argument("--execution-backend", default="dry-run", choices=["dry-run", "shell"])
+    batch.add_argument("--execution-backend", default="dry-run", choices=["dry-run", "shell", "agent-task"])
     batch.add_argument("--review-ensemble", type=int, default=1)
     batch.add_argument("--loop-mode", default="standard", choices=["fast", "standard", "strict"])
     batch.add_argument("--max-big-loops", type=int, default=None)
