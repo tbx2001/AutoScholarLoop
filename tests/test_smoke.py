@@ -35,6 +35,26 @@ def test_supported_paper_formats_run(tmp_path: Path) -> None:
         assert f'"key": "{key}"' in profile
 
 
+def test_agent_task_backend_writes_skill_task_package(tmp_path: Path) -> None:
+    ws = ResearchWorkspace.create(tmp_path / "agent_task_run")
+    pipeline = build_default_pipeline(loop_mode="fast", execution_backend="agent-task")
+    state = pipeline.run(workspace=ws, seed="agent task seed", references=[])
+    task_dir = tmp_path / "agent_task_run" / "agent_tasks" / "S02_R01_execution_bridge"
+    task_json = task_dir / "task.json"
+    task_md = task_dir / "TASK.md"
+    expected_schema = task_dir / "expected_result_schema.json"
+    assert Path(state["final_draft_path"]).exists()
+    assert task_json.exists()
+    assert task_md.exists()
+    assert expected_schema.exists()
+    task_text = task_json.read_text(encoding="utf-8")
+    assert '"skill": "autoscholar-execution-bridge"' in task_text
+    assert '"allowed_write_roots": [' in task_text
+    assert "../" not in task_text
+    generated_code = (tmp_path / "agent_task_run" / "02_execution" / "GENERATED_CODE.md").read_text(encoding="utf-8")
+    assert "External Agent Tasks" in generated_code
+
+
 def test_quality_gate_rejects_hypothesis_without_support() -> None:
     assert _is_unsupported_claim({"claim": "x", "support": None, "status": "hypothesis"})
     assert _is_unsupported_claim({"claim": "x", "support": "None", "status": "supported"})
