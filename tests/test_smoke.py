@@ -3,6 +3,7 @@ from pathlib import Path
 from open_research_agent.core.pipeline import build_default_pipeline
 from open_research_agent.core.research_loop import _is_unsupported_claim
 from open_research_agent.core.workspace import ResearchWorkspace
+from open_research_agent.skills.registry import STAGE_SKILLS
 from open_research_agent.writing.paper_formats import FORMATS
 
 
@@ -14,6 +15,8 @@ def test_default_pipeline_runs(tmp_path: Path) -> None:
     assert Path(state["final_draft_path"]).exists()
     assert ws.manifest()["stages"][-1]["stage"] == "release"
     assert (tmp_path / "run" / "00_field_context" / "progress_index.md").exists()
+    assert (tmp_path / "run" / "00_field_context" / "skills_manifest.md").exists()
+    assert (tmp_path / "run" / "03_writing" / "skill_support.md").exists()
     assert (tmp_path / "run" / "04_quality" / "final_gate.md").exists()
     assert (tmp_path / "run" / "01_decision" / "capability_contracts.md").exists()
     assert (tmp_path / "run" / "01_decision" / "IDEA_REPORT.md").exists()
@@ -33,6 +36,13 @@ def test_supported_paper_formats_run(tmp_path: Path) -> None:
         assert (tmp_path / key / "paper" / "main.tex").exists()
         profile = (tmp_path / key / "paper" / "format_profile.json").read_text(encoding="utf-8")
         assert f'"key": "{key}"' in profile
+
+
+def test_stage_skill_registry_paths_exist() -> None:
+    root = Path(__file__).resolve().parents[1]
+    assert set(STAGE_SKILLS) == {"S00", "S01", "S02", "S03", "S04"}
+    for skill in STAGE_SKILLS.values():
+        assert (root / skill.path).exists(), skill.path
 
 
 def test_quality_gate_rejects_hypothesis_without_support() -> None:
