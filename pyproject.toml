@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "autoscholarloop"
-version = "0.1.0"
+version = "0.2.7"
 description = "Multi-agent AUTO Research loop for idea discovery, execution, paper writing, quality audit, and Web-based observation."
 readme = "README.md"
 requires-python = ">=3.10"
