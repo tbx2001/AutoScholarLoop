@@ -12,7 +12,7 @@ will need stronger backends in later versions.
 | Novelty checking | Supported | `NoveltyStage` plus `local`, `semanticscholar`, `openalex` providers |
 | Literature search | Supported | `adapters/literature.py` |
 | Experiment planning | Supported | `PlanningStage` |
-| Experiment execution | Supported by backend | `dry-run` and `shell` execution backends |
+| Experiment execution | Supported by backend | `dry-run`, `shell`, and `agent-task` execution backends |
 | Iterative result capture | Supported at artifact level | execution report and manifest ledger |
 | Plot/figure handling | Partial | artifact model exists; figure registry planned |
 | Paper writing | Supported | Markdown writer and LaTeX exporter |
@@ -27,7 +27,7 @@ will need stronger backends in later versions.
 | Multiple model APIs | Partial | OpenAI-compatible adapter; Anthropic/Gemini dedicated adapters planned |
 | Parallel evaluation | Supported | `batch --parallel N` creates independent workspaces |
 | Containerization | Planned | Docker safety profile not added yet |
-| Codex/ClaudeCode skills | Designed | `docs/SKILLS_INTEGRATION.md`; skill package files planned |
+| Codex/ClaudeCode skills | Supported as task bridge | `agent-task` backend plus `skills/autoscholar-execution-bridge` |
 
 ## Important Interpretation
 

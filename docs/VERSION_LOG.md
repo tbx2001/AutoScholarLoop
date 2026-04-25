@@ -193,3 +193,21 @@ Changed:
   `pdflatex`, and performs multi-pass compilation;
 - compile reports include engine, pass count, command logs, and PDF path when
   generated.
+
+## v0.2.7 Agent Task Skill Bridge
+
+Date: 2026-04-25
+
+Added:
+
+- `agent-task` execution backend for S02 external coding-agent handoff;
+- auditable task packages under `agent_tasks/S02_RXX_execution_bridge/`;
+- repository skill template at `skills/autoscholar-execution-bridge`;
+- Web checkpoint preview support for the first agent task;
+- smoke test coverage for task package generation.
+
+Design note:
+
+- The orchestrator does not invoke external coding agents directly. It writes a
+  durable task contract that Codex, ClaudeCode, Cursor, or a human can complete
+  while preserving workspace safety boundaries.
