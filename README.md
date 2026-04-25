@@ -54,9 +54,10 @@ the paper, and where quality gates passed or failed.
   model-backed research run.
 - OpenAI-compatible provider adapter for real model APIs.
 - Local, Semantic Scholar, and OpenAlex literature adapters.
-- Dry-run and local shell execution backends. The Web console defaults to local
-  shell execution: model-generated code is written under `code/` and then run
-  on the current machine.
+- Dry-run, local shell, and agent-task execution backends. Agent-task mode
+  writes auditable task packages that external coding agents or repository
+  skills can complete without giving the Web server direct control of a coding
+  agent.
 - Format-aware paper writing for `acm`, `ieee`, `springer_lncs`, and
   `chinese_thesis`.
 - Markdown and LaTeX manuscript export.
@@ -111,6 +112,14 @@ autoscholarloop run `
 ```
 
 The legacy command alias `new-ai-scientist` is kept for compatibility.
+
+Execution backend choices:
+
+- `dry-run`: records a traceable pseudo-run and does not execute commands.
+- `shell`: runs generated experiment commands in the run workspace.
+- `agent-task`: writes `agent_tasks/S02_RXX_execution_bridge/` packages for
+  external coding agents or skills. This is the safest bridge for Codex,
+  ClaudeCode, Cursor, or human-in-the-loop implementation work.
 
 By default, `local` provider mode is a deterministic demo. For real research
 runs, configure an OpenAI-compatible model provider and API key. The system
@@ -177,6 +186,7 @@ run/
   source_papers/
   inputs/
   artifacts/
+  agent_tasks/
   logs/
   code/
   00_field_context/
@@ -193,6 +203,7 @@ Important outputs include:
 - `code/experiments/run_experiment.py`
 - `code/methods/proposed_method.py`
 - `code/experiments/result.json`
+- `agent_tasks/S02_R01_execution_bridge/TASK.md` when `--execution-backend agent-task` is used
 - `00_field_context/field_map.md`
 - `00_field_context/paper_cards.md`
 - `01_decision/IDEA_REPORT.md`
@@ -228,6 +239,7 @@ package, not a guarantee of venue compliance.
 ```text
 docs/                         Design, roadmap, workflow, and version notes
 src/open_research_agent/       Python research loop package
+skills/                       Repository skill templates for external agents
 web/                          Vue Web console
 configs/                       Example pipeline configs
 templates/                     Research workspace templates
