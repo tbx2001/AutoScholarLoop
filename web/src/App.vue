@@ -416,6 +416,7 @@ async function openArtifact(item) {
             <select v-model="form.execution_backend">
               <option value="dry-run">dry-run</option>
               <option value="shell">shell</option>
+              <option value="agent-task">agent-task</option>
             </select>
           </label>
           <label :title="tip('decisionRounds')">{{ t.decisionRounds }}<input v-model.number="form.decision_rounds" type="number" min="1" max="30" /></label>
